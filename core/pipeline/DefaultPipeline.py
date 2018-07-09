@@ -1,0 +1,2 @@
+class DefaultPipeline(object):
+    pass

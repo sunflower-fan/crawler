@@ -1,0 +1,2 @@
+class DefaultScheduler(object):
+    pass

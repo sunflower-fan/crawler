@@ -1,0 +1,2 @@
+class DefaultDownloader(object):
+    pass
