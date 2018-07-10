@@ -17,7 +17,6 @@ class Spider(object):
         self.scheduler.put(self.request)
         while True:
             rq = self.scheduler.get()
-            self.scheduler.task_done()
             page = self.downloader.download(rq)
             self.pageProcessor.process(page)
             self.scheduler.put(page.newRequests)
