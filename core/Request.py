@@ -1,2 +1,4 @@
 class Request(object):
-    pass
+
+    def __init__(self) -> None:
+        self.url
