@@ -4,7 +4,7 @@ from queue import Queue
 class DefaultScheduler(object):
 
     def __init__(self) -> None:
-        self.queue = Queue.queue()
+        self.queue = Queue()
 
     def put(self, request):
         self.queue.put(request)
@@ -13,4 +13,4 @@ class DefaultScheduler(object):
         return self.queue.get()
 
     def qsize(self):
-        self.queue.qsize()
+        return self.queue.qsize()
