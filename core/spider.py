@@ -1,14 +1,15 @@
 from core.downloader.defaultDownloader import DefaultDownloader
 from core.pipeline.defaultPipeline import DefaultPipeline
 from core.scheduler.defaultScheduler import DefaultScheduler
+from core.processor.processordispatcher import ProcessorDispatcher
 
 
 class Spider(object):
 
-    def __init__(self, page_processor) -> None:
+    def __init__(self) -> None:
         self.request = None
         self.coroutineNum = 1
-        self.pageProcessor = page_processor
+        self.pageProcessor = ProcessorDispatcher()
         self.downloader = DefaultDownloader()
         self.pipeline = DefaultPipeline()
         self.scheduler = DefaultScheduler()
@@ -18,7 +19,7 @@ class Spider(object):
         while True:
             rq = self.scheduler.get()
             page = self.downloader.download(rq)
-            self.pageProcessor.process(page)
+            self.pageProcessor.execute(rq, page)
             if page.newRequests:
                 self.scheduler.put(page.newRequests)
             self.pipeline.save(page.pageItems)
