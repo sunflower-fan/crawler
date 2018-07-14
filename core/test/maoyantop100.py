@@ -20,7 +20,7 @@ def get_movie_info(page):
     pattern = re.compile(
         '<div class="movie-brief-container" >[\s\S]*?class="name">([\s\S]*?)</h3>[\s\S]*?class="ellipsis">([\s\S]*?)</li>[\s\S]*?class="ellipsis">([\s\S]*?)</li>[\s\S]*?class="ellipsis">([\s\S]*?)</li>[\s\S]*?class="action-buyBtn"')
     info_list = pattern.findall(page.content)
-    page.pageItems = Item(name=info_list[0][0], country=info_list[0][2].replace('\n', ""), date=info_list[0][3])
+    page.pageItems = [Item(name=info_list[0][0], country=info_list[0][2].replace('\n', ""), date=info_list[0][3])]
 
 
 class Item(object):
@@ -37,4 +37,7 @@ class Item(object):
 if __name__ == '__main__':
     url = "https://maoyan.com/board/4?offset={}"
     rq = [Request(url=url.format(offset), processor=get_detail_url, headers=headers) for offset in range(0, 100, 10)]
-    Spider(rq).start()
+    spider = Spider(rq)
+    spider.coroNum = 10
+    spider.start()
+    print("Elapsed time: {}".format(spider.t1 - spider.t0))

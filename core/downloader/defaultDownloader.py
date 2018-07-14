@@ -1,5 +1,6 @@
-import requests
 from core.page import Page
+
+import aiohttp
 
 
 class DefaultDownloader(object):
@@ -7,8 +8,9 @@ class DefaultDownloader(object):
     def __init__(self) -> None:
         super().__init__()
 
-    def download(self, request):
-        rs = requests.get(url=request.url, headers=request.headers)
-        page = Page()
-        page.content = rs.text
-        return page
+    async def download(self, rq):
+        async with aiohttp.request(method='GET', url=rq.url, headers=rq.headers) as r:
+            content = await r.text()
+            page = Page()
+            page.content = content
+            return page
