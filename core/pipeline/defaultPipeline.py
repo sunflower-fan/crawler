@@ -1,4 +1,3 @@
 class DefaultPipeline(object):
-    def save(self, items):
-        for item in items:
+    def save(self, item):
             print(item)

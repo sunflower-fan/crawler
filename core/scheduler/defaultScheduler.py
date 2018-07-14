@@ -9,6 +9,10 @@ class DefaultScheduler(object):
     def put(self, request):
         self.queue.put(request)
 
+    def put_all(self, request_list):
+        for request in request_list:
+            self.put(request)
+
     def get(self):
         return self.queue.get()
 

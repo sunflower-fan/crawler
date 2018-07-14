@@ -1,5 +1,5 @@
 class Page(object):
     def __init__(self) -> None:
         self.content = None
-        self.newRequests = []
-        self.pageItems = []
+        self.newRequests = None
+        self.pageItems = None
