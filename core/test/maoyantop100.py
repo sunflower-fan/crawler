@@ -38,6 +38,6 @@ if __name__ == '__main__':
     url = "https://maoyan.com/board/4?offset={}"
     rq = [Request(url=url.format(offset), processor=get_detail_url, headers=headers) for offset in range(0, 100, 10)]
     spider = Spider(rq)
-    spider.coroNum = 10
+    spider.coro_num = 10
     spider.start()
     print("Elapsed time: {}".format(spider.t1 - spider.t0))

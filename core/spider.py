@@ -1,22 +1,25 @@
+import urllib
+import time
+import asyncio
+
 from core.downloader.defaultDownloader import DefaultDownloader
 from core.pipeline.defaultPipeline import DefaultPipeline
 from core.scheduler.defaultScheduler import DefaultScheduler
 from core.processor.processordispatcher import ProcessorDispatcher
 
-import time
-import asyncio
-
 
 class Spider(object):
+    # todo seen_url, retry, redirect, exception, logger
 
     def __init__(self, request_list) -> None:
         self.loop = asyncio.get_event_loop()
-        self.requestList = request_list
-        self.coroNum = 1
-        self.pageProcessor = ProcessorDispatcher()
+        self.request_list = request_list
+        self.coro_num = 1
+        self.page_processor = ProcessorDispatcher()
         self.downloader = DefaultDownloader()
         self.pipeline = DefaultPipeline()
         self.scheduler = DefaultScheduler(self.loop)
+        self.root_domains = set()
         self.t0 = None
         self.t1 = None
 
@@ -25,7 +28,7 @@ class Spider(object):
             while True:
                 rq = await self.scheduler.get()
                 page = await self.downloader.download(rq)
-                self.pageProcessor.execute(rq, page)
+                self.page_processor.execute(rq, page)
                 await self.scheduler.put_all(page.newRequests)
                 # self.loop.run_in_executor(None, self.pipeline.save_all, page.pageItems)
                 self.pipeline.save_all(page.pageItems)
@@ -34,8 +37,10 @@ class Spider(object):
             pass
 
     async def run(self):
-        self.scheduler.put_all_nowait(self.requestList)
-        works = [asyncio.Task(coro=self.work(), loop=self.loop) for _ in range(self.coroNum)]
+        for request in self.request_list:
+            self.root_domains.add(urllib.parse.splitport(urllib.parse.urlparse(request.url).netloc)[0])
+        self.scheduler.put_all_nowait(self.request_list)
+        works = [asyncio.Task(coro=self.work(), loop=self.loop) for _ in range(self.coro_num)]
         self.t0 = time.time()
         await self.scheduler.join()
         self.t1 = time.time()
