@@ -1,15 +1,18 @@
 import urllib
 import time
 import asyncio
+import logging
 
 from core.downloader.defaultDownloader import DefaultDownloader
 from core.pipeline.defaultPipeline import DefaultPipeline
 from core.scheduler.defaultScheduler import DefaultScheduler
 from core.processor.processordispatcher import ProcessorDispatcher
 
+LOGGER = logging.getLogger(__name__)
+
 
 class Spider(object):
-    # todo seen_url, retry, redirect, exception, logger
+    # todo exception, logger, retry, redirect
 
     def __init__(self, request_list) -> None:
         self.loop = asyncio.get_event_loop()
@@ -20,19 +23,25 @@ class Spider(object):
         self.pipeline = DefaultPipeline()
         self.scheduler = DefaultScheduler(self.loop)
         self.root_domains = set()
+        self.seen_url = set()
         self.t0 = None
         self.t1 = None
 
     async def work(self):
         try:
             while True:
-                rq = await self.scheduler.get()
-                page = await self.downloader.download(rq)
-                self.page_processor.execute(rq, page)
-                await self.scheduler.put_all(page.newRequests)
-                # self.loop.run_in_executor(None, self.pipeline.save_all, page.pageItems)
-                self.pipeline.save_all(page.pageItems)
-                self.scheduler.task_done()
+                try:
+                    rq = await self.scheduler.get()
+                    page = await self.downloader.download(rq, self)
+                    if page is None:
+                        continue
+                    self.page_processor.execute(rq, page)
+                    await self.scheduler.put_all(page.newRequests)
+                    # self.loop.run_in_executor(None, self.pipeline.save_all, page.pageItems)
+                    self.pipeline.save_all(page.pageItems)
+                    self.scheduler.task_done()
+                except BaseException as e:  # todo
+                    LOGGER.error("Working error, url[{}], http status[{}]".format(rq.url, page.http_status))
         except asyncio.CancelledError:
             pass
 
