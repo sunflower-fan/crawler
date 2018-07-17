@@ -12,7 +12,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Spider(object):
-    # todo retry, redirect
 
     def __init__(self, request_list) -> None:
         self.loop = asyncio.get_event_loop()
@@ -24,6 +23,7 @@ class Spider(object):
         self.scheduler = DefaultScheduler(self.loop)
         self.root_domains = set()
         self.seen_url = set()
+        self.max_retry = 0
         self.t0 = None
         self.t1 = None
 
