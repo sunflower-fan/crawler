@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Spider(object):
-    # todo exception, logger, retry, redirect
+    # todo retry, redirect
 
     def __init__(self, request_list) -> None:
         self.loop = asyncio.get_event_loop()
@@ -40,8 +40,11 @@ class Spider(object):
                     # self.loop.run_in_executor(None, self.pipeline.save_all, page.pageItems)
                     self.pipeline.save_all(page.pageItems)
                     self.scheduler.task_done()
-                except BaseException as e:  # todo
-                    LOGGER.error("Working error, url[{}], http status[{}]".format(rq.url, page.http_status))
+                except asyncio.CancelledError as e:
+                    raise e
+                except BaseException as e:
+                    LOGGER.error(
+                        "Working error, url[{}], http status[{}], detail[{}]".format(rq.url, page.http_status, str(e)))
         except asyncio.CancelledError:
             pass
 

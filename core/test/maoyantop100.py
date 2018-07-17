@@ -37,6 +37,7 @@ class Item(object):
 if __name__ == '__main__':
     url = "https://maoyan.com/board/4?offset={}"
     rq = [Request(url=url.format(offset), processor=get_detail_url, headers=headers) for offset in range(0, 100, 10)]
+    # rq = [Request(url=url.format(0), processor=get_detail_url, headers=headers)]
     spider = Spider(rq)
     spider.coro_num = 10
     spider.start()
