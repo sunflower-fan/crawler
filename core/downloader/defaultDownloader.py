@@ -14,7 +14,7 @@ class DefaultDownloader(object):
         if rq.url in spider.seen_url:
             return None
         retry_count = 0
-        while retry_count < spider.max_retry:
+        while retry_count <= spider.max_retry:
             try:
                 async with aiohttp.request(method='GET', url=rq.url, headers=rq.headers) as r:
                     status = r.status
