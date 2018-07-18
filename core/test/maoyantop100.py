@@ -34,6 +34,14 @@ class Item(object):
         return "name:{}, country:{}, date:{}".format(self.name, self.country, self.date)
 
 
+class MysqlPipeline(object):
+    def save(self, item):
+        pass
+
+    def save_all(self, item):
+        pass
+
+
 if __name__ == '__main__':
     url = "https://maoyan.com/board/4?offset={}"
     rq = [Request(url=url.format(offset), processor=get_detail_url, headers=headers) for offset in range(0, 100, 10)]
